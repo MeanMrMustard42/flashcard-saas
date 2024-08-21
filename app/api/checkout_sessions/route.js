@@ -13,7 +13,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 export async function POST(req) {
   try {
     const params = {
-        unit_amount: formatAmountForStripe(10, 'usd'), // $10.00
         mode: 'subscription',
         payment_method_types: ['card'],
         line_items: [
@@ -23,7 +22,7 @@ export async function POST(req) {
               product_data: {
                 name: 'Pro subscription',
               },
-              unit_amount: 1000, // $10.00 in cents
+              unit_amount: formatAmountForStripe(10, 'usd'), // $10.00
               recurring: {
                 interval: 'month',
                 interval_count: 1,
@@ -32,12 +31,8 @@ export async function POST(req) {
             quantity: 1,
           },
         ],
-        success_url: `${req.headers.get(
-          'Referer',
-        )}result?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${req.headers.get(
-          'Referer',
-        )}result?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `http://localhost:3000/success`,
+        cancel_url: `http://localhost:3000/cancel`,
       }
       
       const checkoutSession = await stripe.checkout.sessions.create(params)
